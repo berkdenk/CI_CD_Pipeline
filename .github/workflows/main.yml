@@ -1,0 +1,35 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main # Kendi ana branch adını buraya yaz (master veya main)
+  pull_request:
+    branches:
+      - main # Kendi ana branch adını buraya yaz
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18' # Uygulamanın kullandığı Node.js versiyonu
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Run tests (Optional)
+      run: npm test
+
+    - name: Simulate Deployment
+      run: |
+        echo "*****************************************************"
+        echo "CI/CD Pipeline: Application built and simulated deploy."
+        echo "In a real scenario, this would deploy to a server (e.g., AWS EC2, S3, Kubernetes)."
+        echo "*****************************************************"
