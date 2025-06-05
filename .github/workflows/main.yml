@@ -1,35 +1,61 @@
-name: CI/CD Pipeline
+name: CI/CD Pipeline with Docker # Renamed for clarity, since I added Docker
 
 on:
   push:
     branches:
-      - main # Kendi ana branch adını buraya yaz (master veya main)
+      - main # My main branch name (either 'master' or 'main')
   pull_request:
     branches:
-      - main # Kendi ana branch adını buraya yaz
+      - main # Also for PRs, making sure I test before merging
 
 jobs:
   build-and-deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # Using Ubuntu, it's generally good for Node.js and Docker
+
+    # IMPORTANT: Need these permissions to push the Docker image to GitHub Container Registry (GHCR)
+    permissions:
+      contents: read # To check out the repository
+      packages: write # To push packages (my Docker image) to GHCR
 
     steps:
-    - name: Check out repository
+    - name: Checkout repository # First step: get my code onto the runner
       uses: actions/checkout@v3
 
-    - name: Set up Node.js
+    - name: Set up Node.js # Next, install Node.js (my app's runtime)
       uses: actions/setup-node@v3
       with:
-        node-version: '18' # Uygulamanın kullandığı Node.js versiyonu
+        node-version: '18' # Specifying my Node.js version, matches my app
 
-    - name: Install dependencies
+    - name: Install dependencies # Install all npm packages from package.json
       run: npm install
 
-    - name: Run tests (Optional)
-      run: npm test
+    - name: Run tests (Optional) # Run my app's tests to ensure quality
+      run: npm test # Currently just a placeholder, but crucial for real apps
 
-    - name: Simulate Deployment
+    # --- DOCKER STEPS START HERE ---
+    # These are new steps for Dockerizing my application
+
+    - name: Log in to GitHub Container Registry # Need to authenticate to push my image
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io # The address for GitHub's container registry
+        username: ${{ github.actor }} # My GitHub username, automatically available
+        password: ${{ secrets.GITHUB_TOKEN }} # Special token provided by GitHub Actions for this repo. It has 'packages:write' permission.
+
+    - name: Build and push Docker image # Building the image from my Dockerfile and sending it to GHCR
+      id: docker_build # Giving this step an ID so I can reference its outputs later
+      uses: docker/build-push-action@v4
+      with:
+        context: . # My Dockerfile is in the root of my repo
+        push: true # Yes, I want to push this image to the registry
+        tags: ghcr.io/${{ github.repository_owner }}/ci-cd-example:latest # The full tag for my image. Format: ghcr.io/MY_GITHUB_USER/IMAGE_NAME:TAG
+
+    # --- DOCKER STEPS END HERE ---
+
+    - name: Simulate Deployment # Final step: show that the build and push were successful
       run: |
         echo "*****************************************************"
-        echo "CI/CD Pipeline: Application built and simulated deploy."
-        echo "In a real scenario, this would deploy to a server (e.g., AWS EC2, S3, Kubernetes)."
+        echo "CI/CD Pipeline: Docker image built and pushed to registry."
+        echo "Image Tag: ${{ steps.docker_build.outputs.tags }}" # Displaying the exact tag of the pushed image
+        echo "In a real scenario, this image would now be deployed to a server (e.g., AWS EC2, EKS, ECS)."
         echo "*****************************************************"
