@@ -64,8 +64,8 @@ This project is open-source and contributions are welcome. If you have any sugge
 
 ## ✉️ Contact
 
-* **Berktuğ Denk** - [Your LinkedIn Profile Link](https://www.linkedin.com/in/yourlinkedinprofile/) (Replace with your actual LinkedIn profile)
-* **Email:** [berktug.denk@example.com] (Replace with your actual email address)
-* **GitHub:** [Your GitHub Profile Link](https://github.com/berkdenk)
+* **Berktuğ Denk** https://www.linkedin.com/in/berktug-denk-180b47279/
+* **Email:** berktugdenk@hotmail.com
+* **GitHub:** https://github.com/berkdenk
 
 ---
